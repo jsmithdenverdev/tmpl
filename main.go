@@ -12,10 +12,12 @@ import (
 func main() {
 	config := &config{}
 
+	// parse command line flags and populate config
 	config.flag()
 
-	// data can optionally be piped into the program instead of read from a file
-	config.readFromStdin = isInputFromStdin()
+	// data can be input and output through file or stdin and stdout respectively
+	config.inputOnStdin = isInputFromStdin()
+	config.outputOnStdout = config.outputPath == ""
 
 	if err := config.validate(); err != nil {
 		_, err = fmt.Fprintf(os.Stderr, "%s\n", err.Error())
@@ -33,7 +35,7 @@ func main() {
 	// additional data from log messages
 	var infoWriter io.Writer
 
-	if config.writeToStdout {
+	if config.outputOnStdout {
 		infoWriter = ioutil.Discard
 	} else {
 		infoWriter = os.Stdout
